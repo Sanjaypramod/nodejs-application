@@ -1,0 +1,50 @@
+## Default values for tmf635-usage.###################
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+resources:
+  limits:
+    cpu: 300m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+replicaCount: 1
+
+env:
+  name: password
+  value: "MyValue"
+image:
+  repository: 039033235676.dkr.ecr.us-west-2.amazonaws.com/repo-dev    ###rinshad11/nodeapp00
+  tag: latest
+  pullPolicy: Always
+  
+service:
+  type: LoadBalancer
+  port: 3000
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+hpa:
+  enabled: true
+  maxReplicas: 2
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 70
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
