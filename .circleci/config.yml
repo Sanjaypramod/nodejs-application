@@ -1,3 +1,4 @@
+
 version: 2.1
 
 executors:
@@ -35,7 +36,7 @@ jobs:
       - run:
           name: Install Pritunl VPN Client
           command: |
-            sudo tee /etc/apt/sources.list.d/pritunl.list <<EOF
+            sudo tee /etc/apt/sources.list.d/pritunl.list \<<EOF
             deb https://repo.pritunl.com/stable/apt focal main
             EOF
 
