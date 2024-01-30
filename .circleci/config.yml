@@ -13,7 +13,7 @@ jobs:
     environment:
       AWS_ACCESS_KEY_ID: 'your-aws-access-key-id'
       AWS_SECRET_ACCESS_KEY: 'your-aws-secret-access-key'
-      AWS_REGION: 'us-west-2'
+      AWS_REGION: 'us-east-2'
 
     steps:
       - checkout
@@ -21,6 +21,12 @@ jobs:
       - run:
           name: Set short git commit SHA
           command: echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $BASH_ENV && source $BASH_ENV
+
+      - run:
+          name: Install AWS CLI
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y awscli
 
       - run:
           name: Configure AWS credentials
