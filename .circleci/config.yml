@@ -37,17 +37,24 @@ jobs:
             docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
             docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
 
-      - name: Install Pritunl VPN
-        run: |
-            sudo tee /etc/apt/sources.list.d/pritunl.list \<< EOF
-            deb https://repo.pritunl.com/stable/apt jammy main
-            EOF
+      jobs:
+       build:
+        docker:
+          - image: ubuntu:latest
+        steps:
+          - run:
+              name: Install Pritunl VPN
+              command: |
+                sudo tee /etc/apt/sources.list.d/pritunl.list \<< EOF
+                deb https://repo.pritunl.com/stable/apt jammy main
+                EOF
 
-            sudo apt --assume-yes install gnupg
-            gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
-            gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A | sudo tee /etc/apt/trusted.gpg.d/pritunl.asc
-            sudo apt update
-            sudo apt install pritunl-client-electron
+                sudo apt --assume-yes install gnupg
+                gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
+                gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A | sudo tee /etc/apt/trusted.gpg.d/pritunl.asc
+                sudo apt update
+                sudo apt install pritunl-client-electron
+
 
 
       - run:
