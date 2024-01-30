@@ -33,30 +33,6 @@ jobs:
           command: aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set region $AWS_REGION
 
       - run:
-          name: Login to Amazon ECR
-          command: |
-            echo "AWS_REGION: $AWS_REGION"
-            echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
-            export AWS_CLI_DISABLE_PROMPT=1
-            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-
-      - run:
-          name: Build, tag, and push image to Amazon ECR
-          command: |
-            docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
-            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
-
-      - run: |
-          sudo tee /etc/apt/sources.list.d/pritunl.list \<< EOF
-          deb https://repo.pritunl.com/stable/apt jammy main
-          EOF
-          sudo apt --assume-yes install gnupg
-          gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
-          gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A | sudo tee /etc/apt/trusted.gpg.d/pritunl.asc
-          sudo apt update
-          sudo apt install pritunl-client-electron
-
-      - run:
           name: Connect VPN
           command: |
             pritunl-client add ./sanjay.tar
@@ -64,7 +40,21 @@ jobs:
 
       - run:
           name: Update kube config
-          command: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+          command: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+
+      - run:
+          name: Login to Amazon ECR
+          command: |
+            echo "AWS_REGION: $AWS_REGION"
+            echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
+            export AWS_CLI_DISABLE_PROMPT=1
+            $(aws ecr get-login --no-include-email --region $AWS_REGION)
+
+      - run:
+          name: Build, tag, and push image to Amazon ECR
+          command: |
+            docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
 
       - run:
           name: Deploy to EKS
