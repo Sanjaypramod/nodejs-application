@@ -1,0 +1,67 @@
+version: 2.1
+
+executors:
+  aws-cli-executor:
+    docker:
+      - image: amazon/aws-cli
+
+jobs:
+  build:
+    docker:
+      - image: cimg/base:stable
+
+    environment:
+      AWS_ACCESS_KEY_ID: 'your-aws-access-key-id'
+      AWS_SECRET_ACCESS_KEY: 'your-aws-secret-access-key'
+      AWS_REGION: 'us-west-2'
+
+    steps:
+      - checkout
+
+      - run:
+          name: Set short git commit SHA
+          command: echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $BASH_ENV && source $BASH_ENV
+
+      - run:
+          name: Configure AWS credentials
+          command: aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set region $AWS_REGION
+
+      - run:
+          name: Login to Amazon ECR
+          command: |
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+      - run:
+          name: Build, tag, and push image to Amazon ECR
+          command: |
+            docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
+
+      - run:
+          name: Install Pritunl VPN
+          command: |
+            sudo tee /etc/apt/sources.list.d/pritunl.list << EOF
+            deb https://repo.pritunl.com/stable/apt jammy main
+            EOF
+
+            sudo apt --assume-yes install gnupg
+            gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
+            gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A | sudo tee /etc/apt/trusted.gpg.d/pritunl.asc
+            sudo apt update
+            sudo apt install pritunl-client-electron
+
+      - run:
+          name: Connect VPN
+          command: |
+            pritunl-client add ./sanjay.tar
+            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
+
+      - run:
+          name: Update kube config
+          command: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+
+      - run:
+          name: Deploy to EKS
+          command: |
+            helm upgrade --install nodeapp-33 helm/chart/ --set image.tag=$COMMIT_SHA
+

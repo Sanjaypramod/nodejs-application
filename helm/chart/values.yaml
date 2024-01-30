@@ -16,7 +16,7 @@ env:
   name: password
   value: "MyValue"
 image:
-  repository: 039033235676.dkr.ecr.us-west-2.amazonaws.com/repo-dev    ###rinshad11/nodeapp00
+  repository: 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2    ###sanjay-repo
   tag: latest
   pullPolicy: Always
   
