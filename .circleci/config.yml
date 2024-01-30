@@ -32,7 +32,11 @@ jobs:
           name: Configure AWS credentials
           command: |
             aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set region $AWS_REGION
-
+      - run:
+          name: check aws
+          command: |
+            aws s3 ls
+            aws --version
       - run:
           name: Login to Amazon ECR
           command: |
