@@ -46,7 +46,7 @@ jobs:
       - run:
           name: Update PATH
           command: |
-            export PATH=$PATH:/usr/bin/pritunl-client
+            export PATH=$PATH:/usr/share/applications/pritunl-client-electron
 
       - run:
           name: Login to Amazon ECR
