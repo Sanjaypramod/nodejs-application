@@ -32,13 +32,12 @@ jobs:
           name: Configure AWS credentials
           command: aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set region $AWS_REGION
 
-     - run:
-         name: Login to Amazon ECR
-         command: |
-           echo "AWS_REGION: $AWS_REGION"
-           echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
-           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-
+      - run:
+          name: Login to Amazon ECR
+          command: |
+            echo "AWS_REGION: $AWS_REGION"
+            echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - run:
           name: Build, tag, and push image to Amazon ECR
@@ -60,7 +59,7 @@ jobs:
           name: Connect VPN
           command: |
             pritunl-client add ./sanjay.tar
-            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr-d '[:space:]')" --password 123456789
+            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
 
       - run:
           name: Update kube config
