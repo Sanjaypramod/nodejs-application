@@ -33,14 +33,20 @@ jobs:
           command: aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set region $AWS_REGION
 
       - run:
-          name: Connect VPN
+          name: Install Pritunl VPN Client
           command: |
-            pritunl-client add ./sanjay.tar
-            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
+            sudo apt-get update
+            sudo apt-get install -y pritunl-client-electron
 
       - run:
-          name: Update kube config
-          command: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+          name: Check Command Availability
+          command: |
+            which pritunl-client
+
+      - run:
+          name: Update PATH
+          command: |
+            export PATH=$PATH:/usr/bin/pritunl-client
 
       - run:
           name: Login to Amazon ECR
@@ -48,13 +54,23 @@ jobs:
             echo "AWS_REGION: $AWS_REGION"
             echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
             export AWS_CLI_DISABLE_PROMPT=1
-            $(aws ecr get-login --no-include-email --region $AWS_REGION)
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - run:
           name: Build, tag, and push image to Amazon ECR
           command: |
             docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
             docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
+
+      - run:
+          name: Connect VPN
+          command: |
+            pritunl-client add ./sanjay.tar
+            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
+
+      - run:
+          name: Update kube config
+          command: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
 
       - run:
           name: Deploy to EKS
