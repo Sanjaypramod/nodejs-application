@@ -1,5 +1,8 @@
 version: '2.1'
 
+orbs:
+  aws-cli: circleci/aws-cli@2.0
+
 executors:
   aws-cli-executor:
     docker:
@@ -28,19 +31,15 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y awscli
 
-      - run:
-          name: Configure AWS credentials
-          command: |
-            aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set region $AWS_REGION
-      - run:
-          name: check aws
-          command: |
-            aws s3 ls
-            aws --version
+      - aws-cli/setup:
+          aws-access-key-id: $AWS_ACCESS_KEY_ID
+          aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
+          aws-region: $AWS_REGION
+
       - run:
           name: Login to Amazon ECR
           command: |
-              aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
+             aws ecr get-login-password --region $AWS_REGION --no-include-email | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - run:
           name: Install Pritunl VPN Client
@@ -67,20 +66,20 @@ jobs:
       - run:
           name: Build, tag, and push image to Amazon ECR
           command: |
-            sudo docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
-            sudo docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
+            docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
 
       - run:
           name: Connect VPN
           command: |
-            sudo pritunl-client add ./sanjay.tar
-            sudo pritunl-client start "$(sudo pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
+            pritunl-client add ./sanjay.tar
+            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
 
       - run:
           name: Update kube config
-          command: sudo aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+          command: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
 
       - run:
           name: Deploy to EKS
           command: |
-            sudo helm upgrade --install
+            helm upgrade --install nodeapp-33 helm/chart/ --set image.tag=$COMMIT_SHA
