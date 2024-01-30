@@ -35,7 +35,7 @@ jobs:
       - run:
           name: Login to Amazon ECR
           command: |
-            aws ecr get-login-password --region $AWS_REGION --include-email | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+            $(aws ecr get-login --no-include-email --region $AWS_REGION)
 
       - run:
           name: Build, tag, and push image to Amazon ECR
@@ -57,7 +57,7 @@ jobs:
           name: Connect VPN
           command: |
             pritunl-client add ./sanjay.tar
-            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
+            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr-d '[:space:]')" --password 123456789
 
       - run:
           name: Update kube config
