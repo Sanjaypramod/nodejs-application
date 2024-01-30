@@ -67,4 +67,3 @@ jobs:
           name: Deploy to EKS
           command: |
             helm upgrade --install nodeapp-33 helm/chart/ --set image.tag=$COMMIT_SHA
-
