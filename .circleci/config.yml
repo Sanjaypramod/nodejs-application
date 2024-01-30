@@ -35,7 +35,8 @@ jobs:
       - run:
           name: Login to Amazon ECR
           command: |
-            aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
+            output=$(aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com 2>&1)
+status=$?
 
       - run:
           name: Build, tag, and push image to Amazon ECR
