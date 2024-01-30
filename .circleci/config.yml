@@ -54,6 +54,12 @@ jobs:
             export PATH=$PATH:/usr/share/applications/pritunl-client-electron
 
       - run:
+          name: Debug AWS Credentials
+          command: |
+            echo "AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
+            echo "AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY"
+
+      - run:
           name: Build, tag, and push image to Amazon ECR
           command: |
             docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
