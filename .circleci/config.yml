@@ -36,7 +36,7 @@ jobs:
       - run:
           name: Login to Amazon ECR
           command: |
-             aws ecr get-login-password --region $AWS_REGION --no-include-email | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+             sudo aws ecr get-login-password --region $AWS_REGION --no-include-email | sudo docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - run:
           name: Install Pritunl VPN Client
@@ -63,20 +63,20 @@ jobs:
       - run:
           name: Build, tag, and push image to Amazon ECR
           command: |
-            docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
-            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
+            sudo docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
+            sudo docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
 
       - run:
           name: Connect VPN
           command: |
-            pritunl-client add ./sanjay.tar
-            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
+            sudo pritunl-client add ./sanjay.tar
+            sudo pritunl-client start "$(sudo pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
 
       - run:
           name: Update kube config
-          command: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+          command: sudo aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
 
       - run:
           name: Deploy to EKS
           command: |
-            helm upgrade --install nodeapp-33 helm/chart/ --set image.tag=$COMMIT_SHA
+            sudo helm upgrade --install
