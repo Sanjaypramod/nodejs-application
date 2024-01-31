@@ -48,7 +48,7 @@ jobs:
             ls
             pwd
             pritunl-client          
-            pritunl-client add ./sanjay.tar
+            pritunl-client add /home/circleci/project/sanjay.tar
             pritunl-client list
             pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
 
