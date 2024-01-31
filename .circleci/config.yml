@@ -77,13 +77,13 @@ jobs:
           name: Test Docker connectivity
           command: docker --version
 
-      # - run:
-      #     name: Start Pritunl Client Service
-      #     command:  service pritunl-client-electron start
+      - run:
+          name: Start Pritunl Client Service
+          command:  service pritunl-client start
 
-      # - run:
-      #     name: Check Pritunl Client Service Status
-      #     command: sudo service pritunl-client-electron status
+      - run:
+          name: Check Pritunl Client Service Status
+          command: sudo service pritunl-client status
 
       - run:
           name: Login to Amazon ECR
