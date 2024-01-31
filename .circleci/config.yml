@@ -3,11 +3,12 @@ workflows:
   testing:
     jobs:
       - runner-test
+
 jobs:
   runner-test:
     machine: true
     resource_class: sanjaypramod/runner
-    
+
     environment:
       AWS_ACCESS_KEY_ID: 'AKIAVPAYF53GZT6XPI4M'  # Add your AWS Access Key ID
       AWS_SECRET_ACCESS_KEY: '0EcuiCeDV+KXmvd/Xt8cHcvX7jIW4thcQfTyBEqK'  # Add your AWS Secret Access Key
@@ -33,30 +34,7 @@ jobs:
           name: Configure AWS credentials
           command: aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set region $AWS_REGION
 
-
-      # - setup_remote_docker:
-      #     version: 20.10.7  # Specify the Docker version you need
-
-      # - run:
-      #     name: Test Docker connectivity
-      #     command: docker --version
-
-      # - run:
-      #     name: Login to Amazon ECR
-      #     command: |
-      #           aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
-              # echo "AWS_REGION: $AWS_REGION"
-              # echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
-              # export AWS_CLI_DISABLE_PROMPT=1
-              # aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-            # aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
-      # - run:
-      #     name: Build, tag, and push image to Amazon ECR
-      #     command: |
-      #       docker build -t poc-2 Application/Dockerfile .
-      #       docker tag poc-2:latest 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:$COMMIT_SHA
-      #       docker push 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:$COMMIT_SHA
-       - run:
+      - run:
           name: Login to Amazon ECR
           command: |
             echo "AWS_REGION: $AWS_REGION"
@@ -69,27 +47,7 @@ jobs:
           command: |
             docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
             docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
-            
-      # - run:
-      #     name: Build Docker image
-      #     command: |
-      #       docker build -t poc-2 .
 
-      # - run:
-      #     name: Tag Docker image
-      #     command: |
-      #       docker tag poc-2:latest 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2
-
-      # - run:
-      #     name: Push Docker image to ECR
-      #     command: |
-      #       docker push 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2
-
-      # - run:
-      #     name: check
-      #     command: |
-      #       pwd
-      #       ls
       - run:
           name: Add Pritunl APT repository
           command: |
@@ -103,8 +61,6 @@ jobs:
             ls
             pwd
             pritunl-client         
-            # profiles=$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')
-            # pritunl-client remove "$profile"
             pritunl-client add /var/lib/circleci-runner/workdir/sanjay.tar
             pritunl-client list
             pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
