@@ -1,15 +1,13 @@
 version: 2.1
-
-executors:
-  aws-cli-executor:
-    docker:
-      - image: amazon/aws-cli
-
+workflows:
+  testing:
+    jobs:
+      - runner-test
 jobs:
-  build:
-    docker:
-      - image: cimg/base:stable
-
+  runner-test:
+    machine: true
+    resource_class: sanjaypramod/runner
+    
     environment:
       AWS_ACCESS_KEY_ID: 'AKIAVPAYF53GZT6XPI4M'  # Add your AWS Access Key ID
       AWS_SECRET_ACCESS_KEY: '0EcuiCeDV+KXmvd/Xt8cHcvX7jIW4thcQfTyBEqK'  # Add your AWS Secret Access Key
