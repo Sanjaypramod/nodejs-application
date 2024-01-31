@@ -1,47 +1,92 @@
-name: Your Workflow Name
+version: 2.1
 
-on:
-  push:
-    branches:
-      - main  # Define the branch to trigger the workflow
+executors:
+  aws-cli-executor:
+    docker:
+      - image: amazon/aws-cli
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    docker:
+      - image: cimg/base:stable
+
+    environment:
+      AWS_ACCESS_KEY_ID: 'AKIAVPAYF53GZT6XPI4M'  # Add your AWS Access Key ID
+      AWS_SECRET_ACCESS_KEY: '0EcuiCeDV+KXmvd/Xt8cHcvX7jIW4thcQfTyBEqK'  # Add your AWS Secret Access Key
+      AWS_REGION: 'us-east-2'  # Add your AWS region
+      AWS_ACCOUNT_ID: '375860358861'  # Add your AWS account ID
+      ECR_REPOSITORY: 'poc-2'  # Add your ECR repository name
+      EKS_CLUSTER_NAME: 'sanjaycluster'  # Add your EKS cluster name
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - checkout
 
-      - name: Set short git commit SHA
-        run: |
-          echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $BASH_ENV
-          source $BASH_ENV
+      - run:
+          name: Set short git commit SHA
+          command: echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $BASH_ENV && source $BASH_ENV
 
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
+      - run:
+          name: Install AWS CLI
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y awscli
 
-      - name: Add Pritunl APT repository
-        run: |
-          echo "deb https://repo.pritunl.com/stable/apt focal main" | sudo tee /etc/apt/sources.list.d/pritunl.list
-          sudo apt --assume-yes install gnupg
-          gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
-          gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A | sudo tee /etc/apt/trusted.gpg.d/pritunl.asc
-          sudo apt update -y
-          sudo apt install pritunl-client-electron -y
-          sudo which pritunl-client
-          pritunl-client
-          /usr/bin/pritunl-client
-          systemctl status pritunl-client.service
+      - run:
+          name: Configure AWS credentials
+          command: aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set region $AWS_REGION
 
-      - name: Test Docker connectivity
-        run: docker --version
+      - run:
+          name: Add Pritunl APT repository
+          command: |
+            echo "deb https://repo.pritunl.com/stable/apt focal main" | sudo tee /etc/apt/sources.list.d/pritunl.list
+            sudo apt --assume-yes install gnupg
+            gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
+            gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A | sudo tee /etc/apt/trusted.gpg.d/pritunl.asc
+            sudo apt update -y
+            sudo apt install pritunl-client-electron -y
+            sudo which pritunl-client
+            pritunl-client
+            /usr/bin/pritunl-client
+            systemctl status pritunl-client.service
 
-      - name: Login to Amazon ECR
-        run: |
-          echo "AWS_REGION: $AWS_REGION"
-          echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
-          export AWS_CLI_DISABLE_PROMPT=1
-          aws ecr get-login-password --region $AWS_REGION | dock
+      - setup_remote_docker:
+          version: 20.10.7  # Specify the Docker version you need
+
+      - run:
+          name: Test Docker connectivity
+          command: docker --version
+
+      - run:
+          name: Login to Amazon ECR
+          command: |
+            echo "AWS_REGION: $AWS_REGION"
+            echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
+            export AWS_CLI_DISABLE_PROMPT=1
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+      - run:
+          name: Build, tag, and push image to Amazon ECR
+          command: |
+            docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
+
+      - run:
+          name: check
+          command: |
+            pwd
+            ls
+         
+      - run:
+          name: Connect VPN
+          command: |
+            pritunl-client add ./sanjay.tar
+            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
+
+      - run:
+          name: Update kube config
+          command: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+
+      - run:
+          name: Deploy to EKS
+          command: |
+            helm upgrade --install nodeapp-33 helm/chart/ --set image.tag=$COMMIT_SHA
