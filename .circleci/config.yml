@@ -56,21 +56,34 @@ jobs:
       #       docker build -t poc-2 Application/Dockerfile .
       #       docker tag poc-2:latest 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:$COMMIT_SHA
       #       docker push 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:$COMMIT_SHA
+       - run:
+          name: Login to Amazon ECR
+          command: |
+            echo "AWS_REGION: $AWS_REGION"
+            echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
+            export AWS_CLI_DISABLE_PROMPT=1
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - run:
-          name: Build Docker image
+          name: Build, tag, and push image to Amazon ECR
           command: |
-            docker build -t poc-2 .
+            docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
+            
+      # - run:
+      #     name: Build Docker image
+      #     command: |
+      #       docker build -t poc-2 .
 
-      - run:
-          name: Tag Docker image
-          command: |
-            docker tag poc-2:latest 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2
+      # - run:
+      #     name: Tag Docker image
+      #     command: |
+      #       docker tag poc-2:latest 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2
 
-      - run:
-          name: Push Docker image to ECR
-          command: |
-            docker push 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2
+      # - run:
+      #     name: Push Docker image to ECR
+      #     command: |
+      #       docker push 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2
 
       # - run:
       #     name: check
