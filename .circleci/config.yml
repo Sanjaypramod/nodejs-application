@@ -11,12 +11,12 @@ jobs:
       - image: cimg/base:stable
 
     environment:
-      AWS_ACCESS_KEY_ID: 'AKIAVPAYF53GZT6XPI4M'
-      AWS_SECRET_ACCESS_KEY: '0EcuiCeDV+KXmvd/Xt8cHcvX7jIW4thcQfTyBEqK'
-      AWS_REGION: 'us-east-2'
-      AWS_ACCOUNT_ID: '375860358861'  # Add your AWS account ID here
-      ECR_REPOSITORY: 'poc-2'  # Add your ECR repository name here
-      EKS_CLUSTER_NAME: 'sanjaycluster'  # Add your EKS cluster name here
+      AWS_ACCESS_KEY_ID: 'AKIAVPAYF53GZT6XPI4M'  # Add your AWS Access Key ID
+      AWS_SECRET_ACCESS_KEY: '0EcuiCeDV+KXmvd/Xt8cHcvX7jIW4thcQfTyBEqK'  # Add your AWS Secret Access Key
+      AWS_REGION: 'us-east-2'  # Add your AWS region
+      AWS_ACCOUNT_ID: '375860358861'  # Add your AWS account ID
+      ECR_REPOSITORY: 'poc-2'  # Add your ECR repository name
+      EKS_CLUSTER_NAME: 'sanjaycluster'  # Add your EKS cluster name
 
     steps:
       - checkout
@@ -38,7 +38,7 @@ jobs:
       - run:
           name: Install Pritunl VPN Client
           command: |
-            sudo tee /etc/apt/sources.list.d/pritunl.list <<EOF
+            sudo tee /etc/apt/sources.list.d/pritunl.list \<<EOF
             deb https://repo.pritunl.com/stable/apt focal main
             EOF
 
