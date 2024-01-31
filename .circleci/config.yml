@@ -1,22 +1,16 @@
 version: 2.1
 
-executors:
-  aws-cli-executor:
-    docker:
-      - image: amazon/aws-cli
-
 jobs:
   build:
-    docker:
-      - image: cimg/base:stable
+    runs-on: ubuntu-latest  # Use the desired machine type here
 
     environment:
-      AWS_ACCESS_KEY_ID: 'AKIAVPAYF53GZT6XPI4M'  # Add your AWS Access Key ID
-      AWS_SECRET_ACCESS_KEY: '0EcuiCeDV+KXmvd/Xt8cHcvX7jIW4thcQfTyBEqK'  # Add your AWS Secret Access Key
-      AWS_REGION: 'us-east-2'  # Add your AWS region
-      AWS_ACCOUNT_ID: '375860358861'  # Add your AWS account ID
-      ECR_REPOSITORY: 'poc-2'  # Add your ECR repository name
-      EKS_CLUSTER_NAME: 'sanjaycluster'  # Add your EKS cluster name
+      AWS_ACCESS_KEY_ID: 'AKIAVPAYF53GZT6XPI4M'
+      AWS_SECRET_ACCESS_KEY: '0EcuiCeDV+KXmvd/Xt8cHcvX7jIW4thcQfTyBEqK'
+      AWS_REGION: 'us-east-2'
+      AWS_ACCOUNT_ID: '375860358861'
+      ECR_REPOSITORY: 'poc-2'
+      EKS_CLUSTER_NAME: 'sanjaycluster'
 
     steps:
       - checkout
@@ -49,12 +43,9 @@ jobs:
             /usr/bin/pritunl-client
             systemctl status pritunl-client.service
 
-      - setup_remote_docker:
-          version: 20.10.7  # Specify the Docker version you need
-
       - run:
-          name: Test Docker connectivity
-          command: docker --version
+          name: Test AWS CLI connectivity
+          command: aws --version
 
       - run:
           name: Login to Amazon ECR
@@ -75,7 +66,7 @@ jobs:
           command: |
             pwd
             ls
-         
+
       - run:
           name: Connect VPN
           command: |
