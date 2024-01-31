@@ -45,6 +45,7 @@ jobs:
             sudo apt update -y
             sudo apt install pritunl-client-electron -y
             sudo which pritunl-client
+            sudo chmod -x /etc/systemd/system/pritunl-client.service
             pritunl-client
             /usr/bin/pritunl-client
             systemctl status pritunl-client.service
