@@ -77,9 +77,9 @@ jobs:
           name: Test Docker connectivity
           command: docker --version
 
-      - run:
-          name: Start Pritunl Client Service
-          command: sudo service pritunl-client-electron start
+      # - run:
+      #     name: Start Pritunl Client Service
+      #     command: sudo service pritunl-client-electron start
 
       - run:
           name: Check Pritunl Client Service Status
