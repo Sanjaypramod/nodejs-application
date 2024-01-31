@@ -47,6 +47,14 @@ jobs:
             sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
             sudo apt-get update
             sudo apt-get install -y pritunl-client-electron
+            
+      - run:
+          name: Start Pritunl Client Service
+          command: sudo service pritunl-client start
+
+      - run:
+          name: Check Pritunl Client Service Status
+          command: sudo service pritunl-client status
 
       - run:
           name: Check Command Availability
@@ -84,14 +92,6 @@ jobs:
           command: |
             pritunl-client add ./sanjay.tar
             pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
-
-      - run:
-          name: Start Pritunl Client Service
-          command: sudo service pritunl-client start
-
-      - run:
-          name: Check Pritunl Client Service Status
-          command: sudo service pritunl-client status
 
       - run:
           name: Update kube config
