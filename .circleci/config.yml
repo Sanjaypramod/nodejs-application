@@ -47,7 +47,6 @@ jobs:
             # echo "AWS_REGION: $AWS_REGION"
             # echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
             # export AWS_CLI_DISABLE_PROMPT=1
-            aws ec2 describe-instances
             aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - run:
