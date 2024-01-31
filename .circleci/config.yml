@@ -83,7 +83,7 @@ jobs:
 
       - run:
           name: Check Pritunl Client Service Status
-          command: sudo service pritunl-client status
+          command: service pritunl-client status
 
       - run:
           name: Login to Amazon ECR
