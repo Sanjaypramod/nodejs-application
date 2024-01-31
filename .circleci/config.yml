@@ -27,7 +27,7 @@ jobs:
           name: Install AWS CLI
           command: |
             whoami
-            apt-get install -y awscli
+            sudo apt-get install -y awscli
 
       - run:
           name: Configure AWS credentials
