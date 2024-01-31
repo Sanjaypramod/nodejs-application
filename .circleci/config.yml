@@ -45,7 +45,9 @@ jobs:
             sudo which pritunl-client
             ls
             pwd
-            pritunl-client          
+            pritunl-client         
+            profiles=$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')
+            pritunl-client remove "$profile"
             pritunl-client add /var/lib/circleci-runner/workdir/sanjay.tar
             pritunl-client list
             pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
