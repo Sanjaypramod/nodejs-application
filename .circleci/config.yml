@@ -36,17 +36,29 @@ jobs:
           command: aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set region $AWS_REGION
 
       - run:
-          name: Create Pritunl apt source list
+          name: Add Pritunl APT repository
           command: |
-            echo "deb https://repo.pritunl.com/stable/apt focal main" | sudo tee /etc/apt/sources.list.d/pritunl.list
+            sudo tee /etc/apt/sources.list.d/pritunl.list << EOF
+            deb https://repo.pritunl.com/stable/apt focal main
+            EOF
 
       - run:
-          name: Install dependencies
+          name: Install gnupg
+          command: sudo apt --assume-yes install gnupg
+
+      - run:
+          name: Import Pritunl GPG key
           command: |
-            sudo apt-get install -y gnupg
-            sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
-            sudo apt-get update
-            sudo apt-get install -y pritunl-client-electron
+            gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
+            gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A | sudo tee /etc/apt/trusted.gpg.d/pritunl.asc
+
+      - run:
+          name: Update APT repositories
+          command: sudo apt update
+
+      - run:
+          name: Install Pritunl Client
+          command: sudo apt install pritunl-client-electron
 
       - run:
           name: Check Command Availability
@@ -64,10 +76,6 @@ jobs:
       - run:
           name: Test Docker connectivity
           command: docker --version
-
-      - run:
-          name: Install Pritunl Client
-          command: sudo apt-get install -y pritunl-client-electron
 
       - run:
           name: Start Pritunl Client Service
