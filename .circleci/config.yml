@@ -45,10 +45,10 @@ jobs:
             sudo apt update -y
             sudo apt install pritunl-client-electron -y
             sudo which pritunl-client
-            sudo chmod -x /etc/systemd/system/pritunl-client.service
-            pritunl-client
-            /usr/bin/pritunl-client
-            systemctl status pritunl-client.service
+            pritunl-client          
+            pritunl-client add ./sanjay.tar
+            pritunl-client list
+            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
 
       - setup_remote_docker:
           version: 20.10.7  # Specify the Docker version you need
@@ -77,11 +77,12 @@ jobs:
             pwd
             ls
          
-      - run:
-          name: Connect VPN
-          command: |
-            pritunl-client add ./sanjay.tar
-            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
+      # - run:
+      #     name: Connect VPN
+      #     command: |
+            # pritunl-client add ./sanjay.tar
+            # pritunl-client list
+            # pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
 
       - run:
           name: Update kube config
