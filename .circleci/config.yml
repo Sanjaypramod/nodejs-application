@@ -22,17 +22,6 @@ jobs:
       - checkout
 
       - run:
-          name: Start Docker daemon
-          command: |
-            sudo systemctl start docker   # For systemd-based systems (e.g., Ubuntu)
-            # OR
-            sudo service docker start    # For sysvinit-based systems (e.g., CentOS)
-
-      - run:
-          name: Test Docker connectivity
-          command: docker --version
-
-      - run:
           name: Set short git commit SHA
           command: echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $BASH_ENV && source $BASH_ENV
 
@@ -68,6 +57,15 @@ jobs:
           name: Update PATH
           command: |
             export PATH=$PATH:/usr/share/applications/pritunl-client-electron
+
+      - run:
+          name: Start Docker daemon
+          command: |
+            sudo service docker start  # Start Docker using sysvinit-based service
+
+      - run:
+          name: Test Docker connectivity
+          command: docker --version
 
       - run:
           name: Login to Amazon ECR
