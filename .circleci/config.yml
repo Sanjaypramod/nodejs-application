@@ -58,14 +58,12 @@ jobs:
           command: |
             export PATH=$PATH:/usr/share/applications/pritunl-client-electron
 
-      - run:
-          name: Start Docker daemon
-          command: |
-            sudo service docker start  # Start Docker using sysvinit-based service
+      - setup_remote_docker:
+          version: 20.10.7  # Specify the Docker version you need
 
       - run:
           name: Test Docker connectivity
-          command: sudo docker --version
+          command: docker --version
 
       - run:
           name: Login to Amazon ECR
