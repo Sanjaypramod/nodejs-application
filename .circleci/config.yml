@@ -1,7 +1,4 @@
-version: '2.1'
-
-orbs:
-  aws-cli: circleci/aws-cli@2.0
+version: 2.1
 
 executors:
   aws-cli-executor:
@@ -14,9 +11,12 @@ jobs:
       - image: cimg/base:stable
 
     environment:
-      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-      AWS_REGION: $AWS_REGION
+      AWS_ACCESS_KEY_ID: 'AKIAVPAYF53GZT6XPI4M'
+      AWS_SECRET_ACCESS_KEY: '0EcuiCeDV+KXmvd/Xt8cHcvX7jIW4thcQfTyBEqK'
+      AWS_REGION: 'us-east-2'
+      AWS_ACCOUNT_ID: '375860358861'  # Add your AWS account ID here
+      ECR_REPOSITORY: 'poc-2'  # Add your ECR repository name here
+      EKS_CLUSTER_NAME: 'sanjaycluster'  # Add your EKS cluster name here
 
     steps:
       - checkout
@@ -31,19 +31,56 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y awscli
 
-      - aws-cli/setup
+      - run:
+          name: Configure AWS credentials
+          command: aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set region $AWS_REGION
+
+      - run:
+          name: Install Pritunl VPN Client
+          command: |
+            sudo tee /etc/apt/sources.list.d/pritunl.list <<EOF
+            deb https://repo.pritunl.com/stable/apt focal main
+            EOF
+
+            sudo apt-get install -y gnupg
+            sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
+
+            sudo apt-get update
+            sudo apt-get install -y pritunl-client-electron
+
+      - run:
+          name: Check Command Availability
+          command: |
+            which pritunl-client
+
+      - run:
+          name: Update PATH
+          command: |
+            export PATH=$PATH:/usr/share/applications/pritunl-client-electron
 
       - run:
           name: Login to Amazon ECR
           command: |
-             aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
+            echo "AWS_REGION: $AWS_REGION"
+            echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
+            export AWS_CLI_DISABLE_PROMPT=1
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com --no-include-email
 
+      - run:
+          name: Build, tag, and push image to Amazon ECR
+          command: |
+            docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
 
-      # Your existing steps...
+      - run:
+          name: Connect VPN
+          command: |
+            pritunl-client add ./sanjay.tar
+            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
 
       - run:
           name: Update kube config
-          command: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
+          command: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
 
       - run:
           name: Deploy to EKS
