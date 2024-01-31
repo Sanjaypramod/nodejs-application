@@ -49,11 +49,11 @@ jobs:
             # export AWS_CLI_DISABLE_PROMPT=1
             # aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
             aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
-
       - run:
           name: Build, tag, and push image to Amazon ECR
           command: |
-            docker build -t 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:$COMMIT_SHA -f Application/Dockerfile .
+            docker build -t poc-2 Application/Dockerfile .
+            docker tag poc-2:latest 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:$COMMIT_SHA
             docker push 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:$COMMIT_SHA
 
       - run:
