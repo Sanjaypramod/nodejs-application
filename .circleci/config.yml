@@ -26,6 +26,7 @@ jobs:
       - run:
           name: Install AWS CLI
           command: |
+            whoami
             sudo apt-get update
             sudo apt-get install -y awscli
 
