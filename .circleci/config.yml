@@ -45,6 +45,8 @@ jobs:
             sudo apt update -y
             sudo apt install pritunl-client-electron -y
             sudo which pritunl-client
+            ls
+            pwd
             pritunl-client          
             pritunl-client add ./sanjay.tar
             pritunl-client list
