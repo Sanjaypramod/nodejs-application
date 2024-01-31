@@ -65,7 +65,7 @@ jobs:
 
       - run:
           name: Test Docker connectivity
-          command: docker --version
+          command: sudo docker --version
 
       - run:
           name: Login to Amazon ECR
