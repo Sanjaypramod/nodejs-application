@@ -46,6 +46,7 @@ jobs:
             sudo apt install pritunl-client-electron -y
             sudo which pritunl-client
             pritunl-clinet
+            /usr/bin/pritunl-client
             service pritunl-client start
 
       - setup_remote_docker:
