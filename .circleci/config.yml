@@ -42,9 +42,6 @@ jobs:
             gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A | sudo tee /etc/apt/trusted.gpg.d/pritunl.asc
             sudo apt update -y
             sudo apt install pritunl-client-electron -y
-            sudo systemctl start dbus
-            sudo chmod -x /etc/systemd/system/pritunl-client.service
-            sudo apt-get install shared-mime-info xdg-utils
             sudo which pritunl-client
             ls
             pwd
