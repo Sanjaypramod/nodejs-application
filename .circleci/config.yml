@@ -86,16 +86,16 @@ jobs:
             pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
 
       - run:
-          name: Update kube config
-          command: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
-
-      - run:
           name: Start Pritunl Client Service
           command: sudo service pritunl-client start
 
       - run:
           name: Check Pritunl Client Service Status
           command: sudo service pritunl-client status
+
+      - run:
+          name: Update kube config
+          command: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
 
       - run:
           name: Deploy to EKS
