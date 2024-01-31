@@ -45,6 +45,8 @@ jobs:
             sudo apt update -y
             sudo apt install pritunl-client-electron -y
             sudo which pritunl-client
+            sudo pritunl-clinet
+            sudo service pritunl-client start
 
       - setup_remote_docker:
           version: 20.10.7  # Specify the Docker version you need
