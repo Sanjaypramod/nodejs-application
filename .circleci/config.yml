@@ -47,7 +47,7 @@ jobs:
             sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
             sudo apt-get update
             sudo apt-get install -y pritunl-client-electron
-            
+
       - run:
           name: Check Command Availability
           command: |
@@ -66,18 +66,16 @@ jobs:
           command: docker --version
 
       - run:
-         name: Install Pritunl Client
-         command: sudo apt-get install -y pritunl-client-electron
-
+          name: Install Pritunl Client
+          command: sudo apt-get install -y pritunl-client-electron
 
       - run:
-         name: Check Pritunl Client Service Status
-         command: sudo service pritunl-client status
-
+          name: Start Pritunl Client Service
+          command: sudo service pritunl-client-electron start
 
       - run:
           name: Check Pritunl Client Service Status
-          command: sudo service pritunl-client status
+          command: sudo service pritunl-client-electron status
 
       - run:
           name: Login to Amazon ECR
