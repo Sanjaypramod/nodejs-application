@@ -36,45 +36,13 @@ jobs:
       - run:
           name: Login to Amazon ECR
           command: |
-             aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
+             aws ecr get-login-password --region $AWS_REGION --no-include-email | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-      - run:
-          name: Install Pritunl VPN Client
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y pritunl-client-electron
-
-      - run:
-          name: Check Command Availability
-          command: |
-            which pritunl-client
-
-      - run:
-          name: Update PATH
-          command: |
-            export PATH=$PATH:/usr/share/applications/pritunl-client-electron
-
-      - run:
-          name: Debug AWS Credentials
-          command: |
-            echo "AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
-            echo "AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY"
-
-      - run:
-          name: Build, tag, and push image to Amazon ECR
-          command: |
-            docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
-            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
-
-      - run:
-          name: Connect VPN
-          command: |
-            pritunl-client add ./sanjay.tar
-            pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
+      # Your existing steps...
 
       - run:
           name: Update kube config
-          command: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+          command: aws eks --region $AWS_REGION update-kubeconfig --name $EKS_CLUSTER_NAME
 
       - run:
           name: Deploy to EKS
