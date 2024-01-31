@@ -38,37 +38,16 @@ jobs:
       - run:
           name: Add Pritunl APT repository
           command: |
-            sudo tee /etc/apt/sources.list.d/pritunl.list \<< EOF
+            sudo tee /etc/apt/sources.list.d/pritunl.list << EOF
             deb https://repo.pritunl.com/stable/apt focal main
             EOF
 
-      - run:
-          name: Install gnupg
-          command: sudo apt --assume-yes install gnupg
-
-      - run:
-          name: Import Pritunl GPG key
-          command: |
+            sudo apt --assume-yes install gnupg
             gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
             gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A | sudo tee /etc/apt/trusted.gpg.d/pritunl.asc
-
-      - run:
-          name: Update APT repositories
-          command: sudo apt update
-
-      - run:
-          name: Install Pritunl Client
-          command: sudo apt install pritunl-client-electron
-
-      - run:
-          name: Check Command Availability
-          command: |
-            which pritunl-client
-
-      - run:
-          name: Update PATH
-          command: |
-            export PATH=$PATH:/usr/share/applications/pritunl-client-electron
+            sudo apt update -y
+            sudo apt install pritunl-client-electron -y
+            sudo which pritunl-client
 
       - setup_remote_docker:
           version: 20.10.7  # Specify the Docker version you need
@@ -76,14 +55,6 @@ jobs:
       - run:
           name: Test Docker connectivity
           command: docker --version
-
-      - run:
-          name: Start Pritunl Client Service
-          command:  service pritunl-client start
-
-      - run:
-          name: Check Pritunl Client Service Status
-          command: service pritunl-client status
 
       - run:
           name: Login to Amazon ECR
