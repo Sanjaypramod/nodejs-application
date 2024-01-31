@@ -49,14 +49,6 @@ jobs:
             sudo apt-get install -y pritunl-client-electron
             
       - run:
-          name: Start Pritunl Client Service
-          command: sudo service pritunl-client start
-
-      - run:
-          name: Check Pritunl Client Service Status
-          command: sudo service pritunl-client status
-
-      - run:
           name: Check Command Availability
           command: |
             which pritunl-client
@@ -72,6 +64,18 @@ jobs:
       - run:
           name: Test Docker connectivity
           command: docker --version
+
+      - run:
+          name: Install Pritunl Client
+          command: sudo apt-get install -y pritunl-client-electron
+
+      - run:
+          name: Start Pritunl Client Service
+          command: sudo service pritunl-client start
+
+      - run:
+          name: Check Pritunl Client Service Status
+          command: sudo service pritunl-client status
 
       - run:
           name: Login to Amazon ECR
