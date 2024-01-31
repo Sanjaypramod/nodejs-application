@@ -90,6 +90,14 @@ jobs:
           command: aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
 
       - run:
+          name: Start Pritunl Client Service
+          command: sudo service pritunl-client start
+
+      - run:
+          name: Check Pritunl Client Service Status
+          command: sudo service pritunl-client status
+
+      - run:
           name: Deploy to EKS
           command: |
             helm upgrade --install nodeapp-33 helm/chart/ --set image.tag=$COMMIT_SHA
