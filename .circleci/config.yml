@@ -47,15 +47,15 @@ jobs:
           command: aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set region $AWS_REGION
 
       - run:
-          name: Install Pritunl VPN Client
+          name: Create Pritunl apt source list
           command: |
-            sudo tee /etc/apt/sources.list.d/pritunl.list <<-EOF
-            deb https://repo.pritunl.com/stable/apt focal main
-            EOF
+            echo "deb https://repo.pritunl.com/stable/apt focal main" | sudo tee /etc/apt/sources.list.d/pritunl.list
 
+      - run:
+          name: Install dependencies
+          command: |
             sudo apt-get install -y gnupg
             sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
-
             sudo apt-get update
             sudo apt-get install -y pritunl-client-electron
 
