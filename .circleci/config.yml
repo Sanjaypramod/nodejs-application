@@ -28,7 +28,7 @@ jobs:
           command: |
             whoami
             sudo -n apt update
-            sudo apt update
+            apt update
             apt-get update
             apt-get install -y awscli
             
