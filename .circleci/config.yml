@@ -42,19 +42,18 @@ jobs:
             cat ~/.aws/credentials
 
       - run:
+          name: Login to Amazon ECR
+          command: |
+            # echo "AWS_REGION: $AWS_REGION"
+            # echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
+            # export AWS_CLI_DISABLE_PROMPT=1
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+      - run:
           name: Build, tag, and push image to Amazon ECR
           command: |
-            # Navigate to the directory containing your Dockerfile
-            cd Application/Dockerfile .
-
-            # Build the Docker image with the specified tag
-            docker build -t "375860358861.dkr.ecr.us-east-2.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA" -f Dockerfile .
-
-            # Authenticate with ECR
-            aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
-
-            # Push the Docker image to ECR
-            docker push "375860358861.dkr.ecr.us-east-2.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA"
+            docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
 
       - run:
           name: Pritunl VPN Configuration
