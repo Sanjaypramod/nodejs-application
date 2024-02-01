@@ -36,11 +36,12 @@ jobs:
             aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
             aws configure set region $AWS_REGION
             export AWS_DEFAULT_OUTPUT="json"
+            aws ecr get-login-password --region us-east-2  | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.region.amazonaws.com
 
       - run:
           name: Login to Amazon ECR
           command: |
-            aws ecr get-login-password --region us-east-2 # | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.region.amazonaws.com
+            # aws ecr get-login-password --region us-east-2 # | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.region.amazonaws.com
 
       - run:
           name: Build, tag, and push image to Amazon ECR
