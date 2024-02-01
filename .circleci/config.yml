@@ -68,6 +68,7 @@ jobs:
             pritunl-client
             pritunl-client add /var/lib/circleci-runner/workdir/poc.test
             pritunl-client list
+            pritunl-client add ./poc.test.tar
             pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
 
       - run:
