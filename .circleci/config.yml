@@ -39,7 +39,7 @@ jobs:
             aws configure set default.output json
             aws sts get-caller-identity --profile default
             aws s3 ls --profile default
-            cat ~/.aws/credential
+            cat ~/.aws/credentials    
              
       - run:
           name: Login to Amazon ECR
