@@ -37,8 +37,8 @@ jobs:
             aws configure set region us-east-2
             # export AWS_DEFAULT_OUTPUT="json"
             aws configure set default.output json
-            sudo apt-get update
-            sudo apt install docker
+            sudo apt-get update -y
+            sudo apt install docker -y
             sudo service docker status
             
 
