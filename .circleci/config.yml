@@ -16,7 +16,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: d84Rl12+/Y2Bc73rcP+B9Oa6lzxviZjMT8IxPfBZ
       AWS_REGION: us-east-2
       AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
-      ECR_REPOSITORY: ${ECR_REPOSITORY}
+      ECR_REPOSITORY: poc-2
       EKS_CLUSTER_NAME: ${EKS_CLUSTER_NAME}
     steps:
       - checkout
@@ -40,17 +40,33 @@ jobs:
             aws sts get-caller-identity --profile default
             aws s3 ls --profile default
             cat ~/.aws/credentials    
-             
-      - run:
-          name: Login to Amazon ECR
-          command: |
-             aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
 
-      - run:
-          name: Build, tag, and push image to Amazon ECR
-          command: |
-            docker build -t "375860358861.dkr.ecr.us-east-2.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA" -f Application/Dockerfile .
-            docker push "375860358861.dkr.ecr.us-east-2.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA"
+     - run:
+         name: Build, tag, and push image to Amazon ECR
+         command: |
+      # Navigate to the directory containing your Dockerfile
+         cd Application/Dockerfile
+
+      # Build the Docker image with the specified tag
+         docker build -t "375860358861.dkr.ecr.us-east-2.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA" -f Dockerfile .
+
+      # Authenticate with ECR
+         aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
+
+      # Push the Docker image to ECR
+        docker push "375860358861.dkr.ecr.us-east-2.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA"
+
+             
+      # - run:
+      #     name: Login to Amazon ECR
+      #     command: |
+      #        aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
+
+      # - run:
+      #     name: Build, tag, and push image to Amazon ECR
+      #     command: |
+      #       docker build -t "375860358861.dkr.ecr.us-east-2.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA" -f Application/Dockerfile .
+      #       docker push "375860358861.dkr.ecr.us-east-2.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA"
             
       - run:
           name: Pritunl VPN Configuration
