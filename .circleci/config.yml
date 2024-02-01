@@ -45,7 +45,7 @@ jobs:
           name: Build, tag, and push image to Amazon ECR
           command: |
             # Navigate to the directory containing your Dockerfile
-            cd Application/Dockerfile
+            cd CircleCI_deployment_helm/Application/Dockerfile .
 
             # Build the Docker image with the specified tag
             docker build -t "375860358861.dkr.ecr.us-east-2.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA" -f Dockerfile .
