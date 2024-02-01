@@ -40,13 +40,15 @@ jobs:
 
       - run:
           name: Login to Amazon ECR
-          command: aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+          command: >
+            echo $AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY | docker login -u AWS --password-stdin https://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - run:
           name: Build, tag, and push image to Amazon ECR
           command: |
             docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA -f Application/Dockerfile .
             docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
+
 
       - run:
           name: Pritunl VPN Configuration
