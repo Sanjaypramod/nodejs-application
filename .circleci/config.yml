@@ -37,6 +37,7 @@ jobs:
             aws configure set region us-east-2
             # export AWS_DEFAULT_OUTPUT="json"
             aws configure set default.output json
+            docker ps
       - run:
           name: Login to Amazon ECR
           command: |
