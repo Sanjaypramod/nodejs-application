@@ -48,8 +48,11 @@ jobs:
       - run:
           name: Build, tag, and push image to Amazon ECR
           command: |
-            docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/poc-2:$COMMIT_SHA -f Application/Dockerfile .
-            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/poc-2:$COMMIT_SHA
+            # docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/poc-2:$COMMIT_SHA -f Application/Dockerfile .
+            # docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/poc-2:$COMMIT_SHA
+              docker build -t poc-2 .
+              docker tag poc-2:latest 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:latest
+              docker push 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:latest
 
       - run:
           name: Pritunl VPN Configuration
