@@ -49,7 +49,7 @@ jobs:
             docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:$COMMIT_SHA
 
       - run:
-          name: Add Pritunl APT repository
+          name: pritunl vpn configuration
           command: |
             echo "deb https://repo.pritunl.com/stable/apt focal main" | sudo tee /etc/apt/sources.list.d/pritunl.list
             sudo apt --assume-yes install gnupg
@@ -61,7 +61,7 @@ jobs:
             ls
             pwd
             pritunl-client         
-            pritunl-client add /var/lib/circleci-runner/workdir/sanjay.tar
+            pritunl-client add /var/lib/circleci-runner/workdir/poc.test
             pritunl-client list
             pritunl-client start "$(pritunl-client list | awk 'NR>2 {print $2}' | tr -d '[:space:]')" --password 123456789
 
