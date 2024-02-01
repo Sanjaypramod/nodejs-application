@@ -53,10 +53,10 @@ jobs:
     resource_class: sanjaypramod/runner
     
     
-      - run:
-          name: Login to Amazon ECR
-          command: |
-            echo $AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY | docker login -u AWS --password-stdin https://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+     - run:
+         name: Login to Amazon ECR
+         command: |
+          echo $AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY | docker login -u AWS --password-stdin https://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - run:
           name: Build, tag, and push image to Amazon ECR
