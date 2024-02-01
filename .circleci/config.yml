@@ -1,4 +1,5 @@
 version: 2.1
+
 workflows:
   testing:
     jobs:
@@ -6,16 +7,18 @@ workflows:
 
 jobs:
   runner-test:
-    machine: true
+    machine:
+      enabled: true
+      image: ubuntu-2004:202010-01  # You can specify the machine image
     resource_class: sanjaypramod/runner
 
     environment:
-      AWS_ACCESS_KEY_ID: 'AKIAVPAYF53GZT6XPI4M'  # Add your AWS Access Key ID
-      AWS_SECRET_ACCESS_KEY: '0EcuiCeDV+KXmvd/Xt8cHcvX7jIW4thcQfTyBEqK'  # Add your AWS Secret Access Key
-      AWS_REGION: 'us-east-2'  # Add your AWS region
-      AWS_ACCOUNT_ID: '375860358861'  # Add your AWS account ID
-      ECR_REPOSITORY: 'poc-2'  # Add your ECR repository name
-      EKS_CLUSTER_NAME: 'sanjaycluster'  # Add your EKS cluster name
+      AWS_ACCESS_KEY_ID: 'AKIAVPAYF53GZT6XPI4M'
+      AWS_SECRET_ACCESS_KEY: '0EcuiCeDV+KXmvd/Xt8cHcvX7jIW4thcQfTyBEqK'
+      AWS_REGION: 'us-east-2'
+      AWS_ACCOUNT_ID: '375860358861'
+      ECR_REPOSITORY: 'poc-2'
+      EKS_CLUSTER_NAME: 'sanjaycluster'
 
     steps:
       - checkout
@@ -26,9 +29,7 @@ jobs:
 
       - run:
           name: Install AWS CLI
-          command: |
-            whoami
-            sudo apt-get install -y awscli
+          command: sudo apt-get update && sudo apt-get install -y awscli
 
       - run:
           name: Configure AWS credentials
@@ -39,7 +40,7 @@ jobs:
 
       - run:
           name: Login to Amazon ECR
-          command: aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
+          command: aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - run:
           name: Build, tag, and push image to Amazon ECR
@@ -70,5 +71,4 @@ jobs:
 
       - run:
           name: Deploy to EKS
-          command: |
-            helm upgrade --install nodeapp-33 helm/chart/ --set image.tag=$COMMIT_SHA
+          command: helm upgrade --install nodeapp-33 helm/chart/ --set image.tag=$COMMIT_SHA
