@@ -13,12 +13,12 @@ jobs:
     resource_class: sanjaypramod/runner
 
     environment:
-      AWS_ACCESS_KEY_ID: 'AKIAVPAYF53GZT6XPI4M'
-      AWS_SECRET_ACCESS_KEY: '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'
-      AWS_REGION: 'us-east-2'
-      AWS_ACCOUNT_ID: '375860358861'
-      ECR_REPOSITORY: 'poc-2'
-      EKS_CLUSTER_NAME: 'sanjaycluster'
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
+      AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
+      ECR_REPOSITORY: ${ECR_REPOSITORY}
+      EKS_CLUSTER_NAME: ${EKS_CLUSTER_NAME}
 
     steps:
       - checkout
