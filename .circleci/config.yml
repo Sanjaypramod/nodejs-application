@@ -35,7 +35,6 @@ jobs:
             aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
             aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
             aws configure set region us-east-2
-            # export AWS_DEFAULT_OUTPUT="json"
             aws configure set default.output json
             aws sts get-caller-identity --profile default
             aws s3 ls --profile default
@@ -44,9 +43,6 @@ jobs:
       - run:
           name: Login to Amazon ECR
           command: |
-            # echo "AWS_REGION: $AWS_REGION"
-            # echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
-            # export AWS_CLI_DISABLE_PROMPT=1
             aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 375860358861.dkr.ecr.us-east-2.amazonaws.com
             
       - run:
