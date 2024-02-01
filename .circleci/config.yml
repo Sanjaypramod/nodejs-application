@@ -12,8 +12,8 @@ jobs:
       image: ubuntu-2004:202010-01  # You can specify the machine image
     resource_class: sanjaypramod/runner
     environment:
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_ACCESS_KEY_ID: AKIAVPAYF53GUHDSYARJ
+      AWS_SECRET_ACCESS_KEY: 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
       AWS_REGION: us-east-2
       AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
       ECR_REPOSITORY: ${ECR_REPOSITORY}
