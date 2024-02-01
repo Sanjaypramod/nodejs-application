@@ -15,9 +15,9 @@ jobs:
       AWS_ACCESS_KEY_ID: AKIAVPAYF53GUHDSYARJ
       AWS_SECRET_ACCESS_KEY: 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
       AWS_REGION: us-east-2
-      AWS_ACCOUNT_ID: ${AWS_ACCOUNT_ID}
+      AWS_ACCOUNT_ID: '375860358861'
       ECR_REPOSITORY: poc-2
-      EKS_CLUSTER_NAME: ${EKS_CLUSTER_NAME}
+      EKS_CLUSTER_NAME: sanjaycluster
     steps:
       - checkout
 
@@ -50,9 +50,8 @@ jobs:
           command: |
             # docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/poc-2:$COMMIT_SHA -f Application/Dockerfile .
             # docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/poc-2:$COMMIT_SHA
-              docker build -t poc-2 .
-              docker tag poc-2:latest 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:latest
-              docker push 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:latest
+              docker build -t 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:$COMMIT_SHA -f Application/Dockerfile .
+              docker push 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2:$COMMIT_SHA   
 
       - run:
           name: Pritunl VPN Configuration
