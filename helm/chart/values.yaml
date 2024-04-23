@@ -1,4 +1,4 @@
-## Default values for tmf635-usage.###################
+## Default values for tmf635-usage.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -13,29 +13,25 @@ resources:
 replicaCount: 1
 
 env:
-  name: password
-  value: "MyValue"
+  - name: password
+    value: "MyValue"
+
 image:
-  repository: 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2    ###sanjay-repo
+  repository: 375860358861.dkr.ecr.us-east-2.amazonaws.com/poc-2 # sanjay-repo
   tag: latest
   pullPolicy: Always
-  
+
 service:
   type: LoadBalancer
   port: 3000
 
 ingress:
   enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  annotations: {} # Example: kubernetes.io/ingress.class: nginx
   path: /
   hosts:
     - chart-example.local
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  tls: [] # Example: - secretName: chart-example-tls, hosts: [chart-example.local]
 
 hpa:
   enabled: true
