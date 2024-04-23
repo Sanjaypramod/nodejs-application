@@ -48,7 +48,9 @@ jobs:
       - name: Update Kubeconfig
         run: |
           echo "Updating Kubeconfig..."
-          aws eks --region us-west-2 update-kubeconfig --name EKSWorkshop-cluster
+          # aws eks --region us-west-2 update-kubeconfig --name EKSWorkshop-cluster
+          aws eks update-kubeconfig --region us-west-2 --name EKSWorkshop-cluster
+
 
           - name: Deploy Helm Chart to EKS
           run: |
