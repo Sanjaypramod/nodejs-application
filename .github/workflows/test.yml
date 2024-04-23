@@ -45,18 +45,22 @@ jobs:
           echo "image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-west-2.amazonaws.com/pocrepo:${{ steps.build-and-deploy.outputs.COMMIT_ID }}" > ./helm/chart/values.yaml
           cat ./helm/chart/values.yaml
 
-      - name: Update Kubeconfig
-        run: |
-          aws eks update-kubeconfig --region us-west-2 --name EKSWorkshop-cluster
-        
+          - name: Update Kubeconfig
+          run: aws eks update-kubeconfig --region us-west-2 --name EKSWorkshop-cluster
+          shell: /usr/bin/bash -e {0}
+          env:
+            AWS_DEFAULT_REGION: us-west-2
+            AWS_REGION: us-west-2
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  
       - name: Deploy Helm Chart to EKS
         run: |
-          echo "Deploying application using Helm..."
-          helm upgrade --install my-website1 ./helm/chart -f ./helm/chart/values.yaml
-          echo "Helm deployment completed."
-        
-      - name: Verify Deployment
-        run: |
-          echo "Verifying deployment..."
-          kubectl get pods
-          kubectl get services
+            echo "Deploying application using Helm..."
+            helm upgrade --install my-website1 ./helm/chart -f ./helm/chart/values.yaml
+            echo "Helm deployment completed."
+          shell: /usr/bin/bash -e {0}
+          env:
+            AWS_DEFAULT_REGION: us-west-2
+            AWS_REGION: us-west-2
+  
