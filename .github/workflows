@@ -1,4 +1,4 @@
-name: Deploy Helm Chart to EKS with sample site
+name: Deploy Helm Chart to EKS with sample site1
 
 on:
   push:
