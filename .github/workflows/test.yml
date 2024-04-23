@@ -50,11 +50,11 @@ jobs:
           echo "Updating Kubeconfig..."
           aws eks --region us-west-2 update-kubeconfig --name EKSWorkshop-cluster
 
-      - name: Deploy Helm Chart to EKS
-        run: |
-        echo "Deploying application using Helm..."
-        helm upgrade --install my-website1 ./helm/my-website -f values.yaml
-        echo "Helm deployment completed."
+          - name: Deploy Helm Chart to EKS
+          run: |
+            echo "Deploying application using Helm..."
+            helm upgrade --install my-website1 ./helm/chart -f ./helm/chart/values.yaml
+            echo "Helm deployment completed."
 
       - name: Verify Deployment
         run: |
