@@ -52,9 +52,9 @@ jobs:
 
       - name: Deploy Helm Chart to EKS
         run: |
-          echo "Deploying application using Helm..."
-          helm upgrade --install my-website1 ./my-website1 -f values.yaml
-          echo "Helm deployment completed."
+        echo "Deploying application using Helm..."
+        helm upgrade --install my-website1 ./helm/my-website -f values.yaml
+        echo "Helm deployment completed."
 
       - name: Verify Deployment
         run: |
@@ -62,9 +62,9 @@ jobs:
           kubectl get pods
           kubectl get services
 
-      - name: Cleanup
-        if: always()
-        run: |
-          echo "Cleaning up..."
-          docker rmi ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-west-2.amazonaws.com/pocrepo:$COMMIT_ID
-          echo "Cleanup completed."
+      # - name: Cleanup
+      #   if: always()
+      #   run: |
+      #     echo "Cleaning up..."
+      #     docker rmi ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-west-2.amazonaws.com/pocrepo:$COMMIT_ID
+      #     echo "Cleanup completed."
