@@ -42,31 +42,21 @@ jobs:
       - name: Update Helm values.yaml
         run: |
           echo "Updating Helm values.yaml with new image..."
-          echo "image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-west-2.amazonaws.com/pocrepo:${{ steps.build-and-deploy.outputs.COMMIT_ID }}" > values.yaml
-          cat values.yaml
+          echo "image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-west-2.amazonaws.com/pocrepo:${{ steps.build-and-deploy.outputs.COMMIT_ID }}" > ./helm/chart/values.yaml
+          cat ./helm/chart/values.yaml
 
       - name: Update Kubeconfig
         run: |
-          # echo "Updating Kubeconfig..."
-          # aws eks --region us-west-2 update-kubeconfig --name EKSWorkshop-cluster
           aws eks update-kubeconfig --region us-west-2 --name EKSWorkshop-cluster
-
-
-          - name: Deploy Helm Chart to EKS
-          run: |
-            echo "Deploying application using Helm..."
-            helm upgrade --install my-website1 ./helm/chart -f ./helm/chart/values.yaml
-            echo "Helm deployment completed."
-
+        
+      - name: Deploy Helm Chart to EKS
+        run: |
+          echo "Deploying application using Helm..."
+          helm upgrade --install my-website1 ./helm/chart -f ./helm/chart/values.yaml
+          echo "Helm deployment completed."
+        
       - name: Verify Deployment
         run: |
           echo "Verifying deployment..."
           kubectl get pods
           kubectl get services
-
-      # - name: Cleanup
-      #   if: always()
-      #   run: |
-      #     echo "Cleaning up..."
-      #     docker rmi ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-west-2.amazonaws.com/pocrepo:$COMMIT_ID
-      #     echo "Cleanup completed."
