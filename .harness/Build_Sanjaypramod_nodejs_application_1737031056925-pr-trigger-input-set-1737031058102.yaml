@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_Sanjaypramod_nodejs_application_1737031056925-pr-trigger-input-set
+  identifier: Build_Sanjaypramod_nodejs_application_1737031056925prtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: Build_Sanjaypramod_nodejs_application_1737031056925
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
